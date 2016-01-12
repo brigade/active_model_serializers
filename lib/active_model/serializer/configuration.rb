@@ -19,6 +19,7 @@ module ActiveModel
           collection_serializer
         end
 
+        config.default_include_tree = '*'
         config.adapter = :attributes
         config.jsonapi_resource_type = :plural
         config.schema_path = 'test/support/schemas'
