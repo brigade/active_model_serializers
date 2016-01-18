@@ -35,7 +35,9 @@ module ActiveModel
 
         def resource_relationships(options)
           relationships = {}
+          excepts = Array(options[:except])
           serializer.associations(@include_tree).each do |association|
+            next if excepts.include?(association.key)
             relationships[association.key] = relationship_value_for(association, options)
           end
 
@@ -47,7 +49,8 @@ module ActiveModel
           return unless association.serializer && association.serializer.object
 
           opts = instance_options.merge(include: @include_tree[association.key])
-          Attributes.new(association.serializer, opts).serializable_hash(options)
+          hash_opts = options.merge(except: association.options[:except])
+          Attributes.new(association.serializer, opts).serializable_hash(hash_opts)
         end
 
         # no-op: Attributes adapter does not include meta data, because it does not support root.
@@ -57,7 +60,9 @@ module ActiveModel
 
         def resource_object_for(options)
           cache_check(serializer) do
-            serializer.attributes(options[:fields])
+            serializer.attributes(
+              only: options[:fields],
+              except: options[:except])
           end
         end
       end

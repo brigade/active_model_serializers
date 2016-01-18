@@ -138,7 +138,7 @@ module ActiveModel
         end
 
         def attributes_for(serializer, fields)
-          serializer.attributes(fields).except(:id)
+          serializer.attributes(only: fields, except: :id)
         end
 
         def resource_object_for(serializer)
