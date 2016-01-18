@@ -19,6 +19,15 @@ module ActiveModel
 
           @serializer = PostSerializer.new(@post)
           @adapter = ActiveModel::Serializer::Adapter::Json.new(@serializer)
+
+          @expected_post_body = {
+            id: 1,
+            reviews: [{ id: 1, body: 'ZOMG A COMMENT' },
+                      { id: 2, body: 'ZOMG ANOTHER COMMENT' }
+                    ],
+            writer: { id: 1, name: 'Steve K.' },
+            site: { id: 1, name: 'My Blog!!' }
+          }
         end
 
         def test_has_many
@@ -32,14 +41,14 @@ module ActiveModel
           serializer = PostWithCustomKeysSerializer.new(@post)
           adapter = ActiveModel::Serializer::Adapter::Json.new(serializer)
 
-          assert_equal({
-            id: 1,
-            reviews: [{ id: 1, body: 'ZOMG A COMMENT' },
-                      { id: 2, body: 'ZOMG ANOTHER COMMENT' }
-                    ],
-            writer: { id: 1, name: 'Steve K.' },
-            site: { id: 1, name: 'My Blog!!' }
-            }, adapter.serializable_hash[:post])
+          assert_equal({ post: @expected_post_body }, adapter.serializable_hash)
+        end
+
+        def test_root_false
+          serializer = PostWithCustomKeysSerializer.new(@post)
+          adapter = ActiveModel::Serializer::Adapter::Json.new(serializer)
+
+          assert_equal(@expected_post_body, adapter.serializable_hash(root: false))
         end
       end
     end

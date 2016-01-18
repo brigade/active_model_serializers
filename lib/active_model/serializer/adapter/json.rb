@@ -7,7 +7,13 @@ module ActiveModel
 
         def serializable_hash(options = nil)
           options ||= {}
-          { root => Attributes.new(serializer, instance_options).serializable_hash(options) }
+          serializable_hash =
+            Attributes.new(serializer, instance_options).serializable_hash(options)
+          if options[:root] == false
+            serializable_hash
+          else
+            { root => serializable_hash }
+          end
         end
 
         private
