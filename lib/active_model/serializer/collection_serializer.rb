@@ -10,9 +10,15 @@ module ActiveModel
       def initialize(resources, options = {})
         @root = options[:root]
         @object = resources
-        @serializers = resources.map do |resource|
+        @instance_options = options
+
+        each_serializer = options[:serializer]
+        unless each_serializer
           serializer_context_class = options.fetch(:serializer_context_class, ActiveModel::Serializer)
-          serializer_class = options.fetch(:serializer) { serializer_context_class.serializer_for(resource) }
+        end
+
+        @serializers = resources.map do |resource|
+          serializer_class = each_serializer || serializer_context_class.serializer_for(resource)
 
           if serializer_class.nil?
             fail NoSerializerError, "No serializer found for resource: #{resource.inspect}"
@@ -35,7 +41,7 @@ module ActiveModel
 
       protected
 
-      attr_reader :serializers
+      attr_reader :instance_options, :serializers
     end
   end
 end
